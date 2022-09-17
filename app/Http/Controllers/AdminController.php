@@ -863,7 +863,11 @@ class AdminController extends Controller
         ->where('date', $date)
         ->where('paperId', $paperId)
         ->where('pageNo', $pageNo)
+        ->where('edition', $paperEdition)
         ->get();
+
+
+
         if (count($frontPage) == 0) {
             $frontPage = array();
             $frontPage[0]['imageUrl'] = 'assets%2Fimg%2FnoFrontPage.jpg';

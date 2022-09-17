@@ -125,7 +125,7 @@
 
                                             </div>
                                             <div class="external-event bg-info" style="cursor: default;"><input
-                                                    type="date" value={{ $date }}
+                                                    type="date" value="{{ date('Y-m-d', strtotime($date)) }}"
                                                     style="background:#17a2b8!important;border: none;color: white;"
                                                     id="defaultDate" /></div>
 
@@ -316,16 +316,7 @@
         });
     </script>
 
-    <script type="text/javascript">
-        var now = new Date();
 
-        var day = ("0" + now.getDate()).slice(-2);
-        var month = ("0" + (now.getMonth() + 1)).slice(-2);
-
-        var today = now.getFullYear() + "-" + (month) + "-" + (day);
-
-        $('#defaultDate').val(today);
-    </script>
 
     <script>
         // $('#addArea').click(function() {
@@ -378,6 +369,56 @@
 
     <script>
         // console.log({!! $date !!})
+
+
+        var isdrawing = false;
+
+        var initialX = 0;
+        var initialY = 0;
+
+        var tempX = 0;
+        var tempY = 0;
+
+        var finalX = 0;
+        var finalY = 0;
+
+        var width = 0;
+        var height = 0;
+
+        var px1_perc = 0;
+        var py1_perc = 0;
+
+        var px2_perc = 0;
+        var py2_perc = 0;
+
+        function getCursorPosition(canvas, event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+
+            console.log("x: " + x + " y: " + y);
+            // console.log("Normal x: " + rect.left + " y: " + rect.top);
+            // console.log("offset x: " + canvas.offsetLeft + " y: " + canvas.offsetTop);
+
+            return [x, y];
+        }
+
+
+        $(document).ready(function() {
+            var myCanvas = document.getElementById("fp-canvas");
+            var myCtx = myCanvas.getContext("2d");
+            var fp_image = document.getElementById("fp-img");
+            myCanvas.width = fp_image.clientWidth;
+            myCanvas.height = fp_image.clientHeight;
+
+            // console.log("Width" + myCanvas.width)
+            // console.log("Height" + myCanvas.height)
+
+            // console.log(myCanvas.getBoundingClientRect())
+        })
+
+
         $(function() {
             cposX = $('#fp-canvas')[0].getBoundingClientRect().x
             cposY = $('#fp-canvas')[0].getBoundingClientRect().y
@@ -390,59 +431,87 @@
             $(window).on('resize', function() {
                 mapped_area()
             })
-        });
 
+        });
 
 
 
         // Event Listener when the mouse is clicked on the canvas area
         $('.fp-canvas').on('mousedown', function(e) {
-            px1_perc = (e.clientX - cposX) / $('#fp-canvas').width()
-            py1_perc = (e.clientY - cposY) / $('#fp-canvas').height()
-            posX = $('#fp-canvas')[0].width * ((e.clientX - cposX) / $('#fp-canvas').width());
-            posY = $('#fp-canvas')[0].height * ((e.clientY - cposY) / $('#fp-canvas').height());
-            isDraw = true
+
+            var myCanvas = document.getElementById("fp-canvas");
+            var myCtx = myCanvas.getContext("2d");
+
+            var xy_cord = getCursorPosition(myCanvas, e);
+            initialX = xy_cord[0];
+            initialY = xy_cord[1];
+
+
+            isdrawing = true;
+
+
+
+
+
+            // myCtx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+            // myCtx.beginPath();
+            // myCtx.lineWidth = "3";
+            // myCtx.strokeStyle = "red";
+            // myCtx.rect(initialX, initialY, 50, 50);
+            // myCtx.stroke();
+
+
+            // console.log(e.clientX);
+            // console.log(e.offsetX);
+
         })
 
         // Event Listener when the mouse is moving on the canvas area. For drawing the rectangular Area
-        $('.fp-canvas').on('mousemove', function(e) {
-            if (isDraw == false)
-                return false;
-            nposX = $('#fp-canvas')[0].width * ((e.clientX - cposX) / $('#fp-canvas').width());
-            nposY = $('#fp-canvas')[0].height * ((e.clientY - cposY) / $('#fp-canvas').height());
-            var height = nposY - posY;
-            var width = nposX - posX;
-            ctx.clearRect(0, 0, $('.fp-canvas')[0].width, $('.fp-canvas')[0].height);
-            ctx.beginPath();
-            ctx.lineWidth = .2;
-            ctx.strokeStyle = "red";
-            ctx.rect(posX, posY, width, height);
-            ctx.stroke();
+        $('.fp-canvas').on('mousemove', function(event) {
+
+            var myCanvas = document.getElementById("fp-canvas");
+            var myCtx = myCanvas.getContext("2d");
+
+            if (isdrawing == false) return false;
+            tempX = event.clientX - myCanvas.getBoundingClientRect().left;
+            tempY = event.clientY - myCanvas.getBoundingClientRect().top;
+
+            width = tempX - initialX;
+            height = tempY - initialY;
+
+            myCtx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+            myCtx.beginPath();
+            myCtx.lineWidth = "1";
+            myCtx.strokeStyle = "red";
+            myCtx.rect(initialX, initialY, width, height);
+            myCtx.stroke();
         })
         // Event Listener when the mouse is up on the canvas area. End of Drawing
-        $('.fp-canvas').on('mouseup', function(e) {
-            px2_perc = (e.clientX - cposX) / $('#fp-canvas').width()
-            py2_perc = (e.clientY - cposY) / $('#fp-canvas').height()
-            nposX = $('#fp-canvas')[0].width * ((e.clientX - cposX) / $('#fp-canvas').width());
-            nposY = $('#fp-canvas')[0].height * ((e.clientY - cposY) / $('#fp-canvas').height());
-            var height = nposY - posY;
-            var width = nposX - posX;
+        $('.fp-canvas').on('mouseup', function(event) {
+            var myCanvas = document.getElementById("fp-canvas");
+            var myCtx = myCanvas.getContext("2d");
 
-            ctx.clearRect(0, 0, $('.fp-canvas')[0].width, $('.fp-canvas')[0].height);
-            ctx.beginPath();
+            var xy_cord = getCursorPosition(myCanvas, event);
+            finalX = xy_cord[0];
+            finalY = xy_cord[1];
 
 
+            width = finalX - initialX;
+            height = finalY - initialY;
 
 
-            ctx.lineWidth = .2;
-            ctx.strokeStyle = "red";
-            ctx.rect(posX, posY, width, height);
-            ctx.stroke();
-            isDraw = false
+            console.log(width, height);
+
+            myCtx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+            myCtx.beginPath();
+            myCtx.lineWidth = "1";
+            myCtx.strokeStyle = "red";
+            myCtx.rect(initialX, initialY, width, height);
+            myCtx.stroke();
+
+
+            isdrawing = false;
         })
-
-
-
 
         // Action when Map Are button is clicked
         $('#map_area').click(function() {
@@ -474,10 +543,10 @@
 
 
             var edition = String({{ $edition }});
-            $('#form_modal').find('input[name="form_x"]').val(px1_perc)
-            $('#form_modal').find('input[name="form_y"]').val(py1_perc)
-            $('#form_modal').find('input[name="form_width"]').val(px2_perc)
-            $('#form_modal').find('input[name="form_height"]').val(py2_perc)
+            $('#form_modal').find('input[name="form_x"]').val(initialX)
+            $('#form_modal').find('input[name="form_y"]').val(initialY)
+            $('#form_modal').find('input[name="form_width"]').val(width)
+            $('#form_modal').find('input[name="form_height"]').val(height)
             $('#form_modal').find('input[name="form_paperId"]').val(paperId)
             $('#form_modal').find('input[name="form_pageNo"]').val(pageNo)
             $('#form_modal').find('input[name="form_date"]').val(currentDate)
@@ -527,28 +596,15 @@
                         'Area Mapped Successfully',
                         '',
                         'success'
-                    )
-
-                    swal({
-                            title: "Area Mapped Successfully",
-                            text: "Once deleted, you will not be able to recover this imaginary file!",
-                            icon: "success",
-                            buttons: true,
-                        })
-                        .then((willDelete) => {
-                            if (willDelete) {
-                                location.reload()
-                            }
-                        });
+                    ).then(() => {
+                        location.reload();
+                    });
 
                 },
                 error: function(jqXHR, textStatus) {
                     console.log(jqXHR)
                 }
             });
-
-
-
         })
 
 
@@ -561,16 +617,17 @@
 
             // console.log(mapAreaData);
             Object.keys(mapAreaData).map(k => {
+
                 var data = mapAreaData[k];
                 var area = $("<area shape='rect'>");
                 area.attr("href", "javascript:void(0)");
-                var x = $("#fp-img").width() * data.x;
-                var y = $("#fp-img").height() * data.y;
-                var width = Math.abs($("#fp-img").width() * Math.abs(data.width) - x);
-                var height = Math.abs($('#fp-img').height() * Math.abs(data.height) - y);
-                if ($("#fp-img").width() * data.width - x < 0) x = x - width;
-                if ($("#fp-img").height() * data.height - y < 0) y = y - height;
-                console.log("X+1", x + ", " + y + ", " + width + ", " + height);
+                var x = data.x;
+                var y = data.y;
+                var width = data.width;
+                var height = data.height
+                // if ($("#fp-img").width() * data.width - x < 0) x = x - width;
+                // if ($("#fp-img").height() * data.height - y < 0) y = y - height;
+                // console.log("X+1", x + ", " + y + ", " + width + ", " + height);
 
                 area.attr("coords", x + ", " + y + ", " + width + ", " + height);
                 area.addClass(
@@ -587,7 +644,7 @@
 
                 area.click(function() {
                     var ctx = $("#fp-canvas")[0].getContext("2d");
-                    console.log("X+2", x + ", " + y + ", " + width + ", " + height);
+                    // console.log("X+2", x + ", " + y + ", " + width + ", " + height);
 
                     var ImageData = ctx.getImageData(x, y, width, height);
                     // create image element
