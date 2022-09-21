@@ -268,7 +268,7 @@ class AdminController extends Controller
 
     public function saveMappedArea(Request $request)
     {
-        // return  $request->paperId;
+        // return  $request;
 
 
         $create = MapArea::create([
@@ -277,10 +277,10 @@ class AdminController extends Controller
         'pageNo' => $request->pageNo,
         'description' => $request->description,
         'connection' => 0,
-        'x' => $request->x,
-        'y' => $request->y,
-        'width' => $request->width,
-        'height' => $request->height,
+        'x1' => $request->x1,
+        'y1' => $request->y1,
+        'x2' => $request->x2,
+        'y2' => $request->y2,
         'edition' => $request->edition,
     ]);
         return true;

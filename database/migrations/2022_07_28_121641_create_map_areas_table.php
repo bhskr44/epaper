@@ -20,10 +20,10 @@ return new class () extends Migration {
             $table->string('pageNo');
             $table->string('description');
             $table->string('connection')->nullable();
-            $table->string('x');
-            $table->string('y');
-            $table->string('width');
-            $table->string('height');
+            $table->string('x1');
+            $table->string('y1');
+            $table->string('x2');
+            $table->string('y2');
             $table->timestamps();
         });
     }

@@ -14,10 +14,10 @@ class MapArea extends Model
         'pageNo',
         'description',
         'connection',
-        'x',
-        'y',
-        'width',
-        'height',
+        'x1',
+        'y1',
+        'x2',
+        'y2',
         'edition'
    ];
 }

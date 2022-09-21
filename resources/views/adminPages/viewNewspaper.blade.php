@@ -178,7 +178,7 @@
 
 
                                 </div>
-                                <div class="row">
+                                <div class="row" style="margin:0">
                                     <div class="col-12" id="fp-canvas-container" style="width:100%; height:100%;">
                                         <map name="fp-map" id="fp-map">
                                         </map>
@@ -244,10 +244,10 @@
                 <div class="modal-body">
                     <form action="" id="mapped-form">
                         <input type="hidden" name="form_id" value="">
-                        <input type="hidden" name="form_x" value="">
-                        <input type="hidden" name="form_y" value="">
-                        <input type="hidden" name="form_width" value="">
-                        <input type="hidden" name="form_height" value="">
+                        <input type="hidden" name="form_x1" value="">
+                        <input type="hidden" name="form_y1" value="">
+                        <input type="hidden" name="form_x2" value="">
+                        <input type="hidden" name="form_y2" value="">
                         <input type="hidden" name="form_paperId" value="">
                         <input type="hidden" name="form_date" value="">
                         <input type="hidden" name="form_edition" value="">
@@ -318,21 +318,7 @@
 
 
 
-    <script>
-        // $('#addArea').click(function() {
 
-        //     $('#addArea').hide();
-        //     $('#saveArea').show();
-
-        // })
-
-        // $('#saveArea').click(function() {
-
-        //     $('#addArea').show();
-        //     $('#saveArea').hide();
-
-        // })
-    </script>
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -391,17 +377,28 @@
         var px2_perc = 0;
         var py2_perc = 0;
 
+
+        var initialX_perc = 0;
+        var initialY_perc = 0;
+
         function getCursorPosition(canvas, event) {
+
             const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
+            // var scaleX = canvas.width / rect.width; // relationship bitmap vs. element for x
+            // var scaleY = canvas.height / rect.height; // relationship bitmap vs. element for y
 
 
-            console.log("x: " + x + " y: " + y);
-            // console.log("Normal x: " + rect.left + " y: " + rect.top);
-            // console.log("offset x: " + canvas.offsetLeft + " y: " + canvas.offsetTop);
+            const x = (event.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
+            const y = (event.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
 
-            return [x, y];
+            // console.log(rect)
+            // const x = (event.clientX - rect.left) * scaleX;
+            // const y = (event.clientY - rect.top) * scaleY;
+            // const x = (event.clientX - rect.left);
+            // const y = (event.clientY - rect.top);
+            // console.log(x, y)
+            return [x - 6, y];
+
         }
 
 
@@ -411,6 +408,14 @@
             var fp_image = document.getElementById("fp-img");
             myCanvas.width = fp_image.clientWidth;
             myCanvas.height = fp_image.clientHeight;
+
+
+            // myCtx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+            // myCtx.beginPath();
+            // myCtx.lineWidth = "3";
+            // myCtx.strokeStyle = "red";
+            // myCtx.rect(-50, -50, 50, 50);
+            // myCtx.stroke();
 
             // console.log("Width" + myCanvas.width)
             // console.log("Height" + myCanvas.height)
@@ -447,6 +452,10 @@
             initialY = xy_cord[1];
 
 
+            initialX_per = (initialX / 100) * myCanvas.width
+            initialY_per = (initialY / 100) * myCanvas.height
+
+
             isdrawing = true;
 
 
@@ -473,8 +482,12 @@
             var myCtx = myCanvas.getContext("2d");
 
             if (isdrawing == false) return false;
-            tempX = event.clientX - myCanvas.getBoundingClientRect().left;
-            tempY = event.clientY - myCanvas.getBoundingClientRect().top;
+
+            var xy_cord = getCursorPosition(myCanvas, event);
+            // tempX = event.clientX - myCanvas.getBoundingClientRect().left;
+            // tempY = event.clientY - myCanvas.getBoundingClientRect().top;
+            tempX = xy_cord[0];
+            tempY = xy_cord[1];
 
             width = tempX - initialX;
             height = tempY - initialY;
@@ -499,8 +512,11 @@
             width = finalX - initialX;
             height = finalY - initialY;
 
+            finalX_per = (finalX / 100) * myCanvas.width
+            finalY_per = (finalY / 100) * myCanvas.height
 
-            console.log(width, height);
+
+            // console.log(width, height);
 
             myCtx.clearRect(0, 0, myCanvas.width, myCanvas.height);
             myCtx.beginPath();
@@ -529,7 +545,7 @@
         })
         // Action when Map Are save is clicked
         $('#save').click(function() {
-            var cP = px1_perc + ", " + py1_perc + ", " + px2_perc + ", " + py2_perc;
+            // var cP = px1_perc + ", " + py1_perc + ", " + px2_perc + ", " + py2_perc;
             var paperId = String({{ $paperId }});
             var pageNo = $("#pageNo").val();
             var currentDate = $('#defaultDate').val()
@@ -542,11 +558,15 @@
             // var date = year + "-" + ("0" + (month)).slice(-2) + "-" + ("0" + (day)).slice(-2)
 
 
+            console.log(initialX_per, initialY_per, finalX_per, finalY_per)
+
+
+
             var edition = String({{ $edition }});
-            $('#form_modal').find('input[name="form_x"]').val(initialX)
-            $('#form_modal').find('input[name="form_y"]').val(initialY)
-            $('#form_modal').find('input[name="form_width"]').val(width)
-            $('#form_modal').find('input[name="form_height"]').val(height)
+            $('#form_modal').find('input[name="form_x1"]').val(initialX_per)
+            $('#form_modal').find('input[name="form_y1"]').val(initialY_per)
+            $('#form_modal').find('input[name="form_x2"]').val(finalX_per)
+            $('#form_modal').find('input[name="form_y2"]').val(finalY_per)
             $('#form_modal').find('input[name="form_paperId"]').val(paperId)
             $('#form_modal').find('input[name="form_pageNo"]').val(pageNo)
             $('#form_modal').find('input[name="form_date"]').val(currentDate)
@@ -560,15 +580,17 @@
             e.preventDefault();
             var data;
             var id = $(this).find('[name="form_id"]').val()
-            var x = $(this).find('[name="form_x"]').val()
-            var y = $(this).find('[name="form_y"]').val()
-            var width = $(this).find('[name="form_width"]').val()
-            var height = $(this).find('[name="form_height"]').val()
+            var x1 = $(this).find('[name="form_x1"]').val()
+            var y1 = $(this).find('[name="form_y1"]').val()
+            var x2 = $(this).find('[name="form_x2"]').val()
+            var y2 = $(this).find('[name="form_y2"]').val()
             var description = $(this).find('[name="form_description"]').val()
             var date = $('#defaultDate').val()
             var paperId = $('#paperId').val()
             var pageNo = $("#pageNo").val();
             var edition = $(this).find('[name="form_edition"]').val()
+
+            console.log(x1, y1, x2, y2)
 
 
 
@@ -580,10 +602,10 @@
                 data: {
                     _token: <?php echo "'" . csrf_token() . "'"; ?>,
                     id: id,
-                    x: x,
-                    y: y,
-                    width: width,
-                    height: height,
+                    x1: x1,
+                    y1: y1,
+                    x2: x2,
+                    y2: y2,
                     description: description,
                     date: date,
                     paperId: paperId,
@@ -611,32 +633,52 @@
 
 
         function mapped_area() {
+            var myCanvas = document.getElementById("fp-canvas");
+            var myCtx = myCanvas.getContext("2d");
+            var fp_image = document.getElementById("fp-img");
+            myCanvas.width = fp_image.clientWidth;
+            myCanvas.height = fp_image.clientHeight;
+
             @if (count($mapAreaData) != 0)
                 mapAreaData = {!! $mapAreaData !!};
             @endif
 
-            // console.log(mapAreaData);
+            console.log(mapAreaData);
             Object.keys(mapAreaData).map(k => {
 
                 var data = mapAreaData[k];
                 var area = $("<area shape='rect'>");
                 area.attr("href", "javascript:void(0)");
-                var x = data.x;
-                var y = data.y;
-                var width = data.width;
-                var height = data.height
+                var new_x1 = (data.x1 * 100) / myCanvas.width;
+                var new_y1 = (data.y1 * 100) / myCanvas.height;
+
+                var new_x2 = (data.x2 * 100) / myCanvas.width;
+                var new_y2 = (data.y2 * 100) / myCanvas.height;
+
+                var width = new_x2 - new_x1;
+                var height = new_y2 - new_y1;
+
+
+
+
+                // var y = $('#fp-img').height() * perc[1];
+                // var width = Math.abs(($('#fp-img').width() * Math.abs(perc[2])) - x);
+                // var height = Math.abs(($('#fp-img').height() * Math.abs(perc[3])) - y);
+
+
+
                 // if ($("#fp-img").width() * data.width - x < 0) x = x - width;
                 // if ($("#fp-img").height() * data.height - y < 0) y = y - height;
                 // console.log("X+1", x + ", " + y + ", " + width + ", " + height);
 
-                area.attr("coords", x + ", " + y + ", " + width + ", " + height);
+                area.attr("coords", new_x1 + ", " + new_y1 + ", " + width + ", " + height);
                 area.addClass(
                     "fw-bolder ");
                 area.css({
                     height: height + "px",
                     width: width + "px",
-                    top: y + "px",
-                    left: x + "px",
+                    top: new_y1 + "px",
+                    left: new_x1 + "px",
                 });
 
                 $("#fp-map").append(area);
@@ -646,7 +688,7 @@
                     var ctx = $("#fp-canvas")[0].getContext("2d");
                     // console.log("X+2", x + ", " + y + ", " + width + ", " + height);
 
-                    var ImageData = ctx.getImageData(x, y, width, height);
+                    var ImageData = ctx.getImageData(new_x1, new_y1, width, height);
                     // create image element
                     var MyImage = new Image();
                     var canvas = $('#fp-canvas')[0];
@@ -659,7 +701,7 @@
                     var image = document.getElementById("fp-img");
 
                     ctx.drawImage(image,
-                        x, y, //from where
+                        new_x1, new_y1, //from where
                         width, height, //how big it would be of the snapshot
                         0, 0, //where we want to be placed
                         width, height //size of the placement
