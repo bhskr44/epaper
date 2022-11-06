@@ -22,6 +22,13 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
+                        <aside class="bg-primary bg-gradient rounded-3  p-sm-5 mb-5 text-center"  style="width:100%; height: 200px;">
+                            <div class="d-flex align-items-center justify-content-between flex-column flex-xl-row text-center text-xl-start">
+                                Place for Google Adv.
+                            </div>
+                        </aside>
+                    </div>
+                    <div class="row">
                         <div class="col-md-2">
                             <div class="sticky-top mb-2">
                                 <aside class="bg-primary bg-gradient rounded-3  p-sm-5 mb-5">

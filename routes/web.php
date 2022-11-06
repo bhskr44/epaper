@@ -27,20 +27,16 @@ Route::get('login', function () {
 
 Route::post('/login', 'App\Http\Controllers\AdminController@login')->name('login');
 Route::post('logout', 'App\Http\Controllers\Auth\AuthenticatedSessionController@destroy')->name('logout');
-
-
 Route::get('/AmarAsom', 'App\Http\Controllers\Controller@AmarAsom')->name('AmarAsom');
 Route::get('/PurvanchalPrahari', 'App\Http\Controllers\Controller@PurvanchalPrahari')->name('PurvanchalPrahari');
 Route::get('/TheMeghalayaGuardian', 'App\Http\Controllers\Controller@TheMeghalayaGuardian')->name('TheMeghalayaGuardian');
 Route::get('/TheNorthEastTimes', 'App\Http\Controllers\Controller@TheNorthEastTimes')->name('TheNorthEastTimes');
-
 Route::get('/newsPaper/{id}', 'App\Http\Controllers\PublicViewController@newspaper')->name('newsPaper');
 
 
 
 Route::group(['middleware' => ['auth', 'role:administrator']], function () {
     Route::get('/auditTrail', 'App\Http\Controllers\AdminController@auditTrail')->name('auditTrail');
-
     Route::get('/dashboard', 'App\Http\Controllers\AdminController@dashboard')->name('dashboard');
     Route::get('/updatenewspaper', 'App\Http\Controllers\AdminController@updatenewspaper')->name('updatenewspaper');
     Route::post('/updatenewspaper', 'App\Http\Controllers\AdminController@updatenewspaperpost')->name('updatenewspaper');
